@@ -1,5 +1,3 @@
-const taskManager = require('./taskManager')
-const responseManager = require('./responseManager')
-const userManager = require('./userManager')
+const responseManager = require('./responseManager')  
 const authManager = require('./authManager')
-module.exports = {taskManager,responseManager,userManager,authManager}
+module.exports = {authManager,responseManager}

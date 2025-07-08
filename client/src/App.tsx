@@ -1,11 +1,12 @@
+import Routing from "./pages"
 
 
 function App() {
-
+ 
   return (
     <>
-     <h1>sadds</h1>
-    </>
+   <Routing />
+  </>
   )
 }
 

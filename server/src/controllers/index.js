@@ -1,3 +1,3 @@
-
+const blogController = require('./blogController')
 const authController = require('./authController')
-module.exports = {authController}
+module.exports = {authController,blogController}

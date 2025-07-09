@@ -1,3 +1,4 @@
 const responseManager = require('./responseManager')  
 const authManager = require('./authManager')
-module.exports = {authManager,responseManager}
+const blogManager = require('./blogManager')
+module.exports = {authManager,responseManager,blogManager}

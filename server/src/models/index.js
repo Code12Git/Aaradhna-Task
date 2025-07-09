@@ -1,2 +1,3 @@
  const user = require('./user')
-module.exports = {userModel:user}
+ const blog = require('./blog')
+module.exports = {userModel:user,blogModel:blog}

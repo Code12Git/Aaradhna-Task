@@ -1,5 +1,5 @@
 import type { blogPayload, blogState } from "@/types/index";
-import { ADD_COMMENT_FAILURE, ADD_COMMENT_REQUEST, ADD_COMMENT_SUCCESS, CREATE_BLOG_FAILURE, CREATE_BLOG_REQUEST, CREATE_BLOG_SUCCESS, DELETE_BLOG_FAILURE, DELETE_BLOG_REQUEST, DELETE_BLOG_SUCCESS, FETCH_BLOG_FAILURE, FETCH_BLOG_REQUEST, FETCH_BLOG_SUCCESS, LIKE_BLOG_FAILURE, LIKE_BLOG_REQUEST, LIKE_BLOG_SUCCESS, UPDATE_BLOG_FAILURE, UPDATE_BLOG_REQUEST, UPDATE_BLOG_SUCCESS } from "../actionTypes/actionTypes";
+import { ADD_COMMENT_FAILURE, ADD_COMMENT_REQUEST, ADD_COMMENT_SUCCESS, CREATE_BLOG_FAILURE, CREATE_BLOG_REQUEST, CREATE_BLOG_SUCCESS, DELETE_BLOG_FAILURE, DELETE_BLOG_REQUEST, DELETE_BLOG_SUCCESS, DELETE_COMMENT_FAILURE, DELETE_COMMENT_REQUEST, DELETE_COMMENT_SUCCESS, FETCH_BLOG_FAILURE, FETCH_BLOG_REQUEST, FETCH_BLOG_SUCCESS, LIKE_BLOG_FAILURE, LIKE_BLOG_REQUEST, LIKE_BLOG_SUCCESS, UPDATE_BLOG_FAILURE, UPDATE_BLOG_REQUEST, UPDATE_BLOG_SUCCESS } from "../actionTypes/actionTypes";
 
 
 const initialState: blogState = {
@@ -134,7 +134,6 @@ const authReducer = (state = initialState, { type, payload }: { type: string; pa
         }  
 
         case ADD_COMMENT_SUCCESS: {
-            console.log(payload);
             return {
                 ...state,
                 blogs: state.blogs?.map(blog => 
@@ -150,6 +149,28 @@ const authReducer = (state = initialState, { type, payload }: { type: string; pa
                 ...state,
                 error:payload,
                 isLoading:false
+            }
+        }
+
+        case DELETE_COMMENT_REQUEST:{
+            return {
+                ...state,
+                isLoading:true
+            }
+        }
+
+        case DELETE_COMMENT_SUCCESS:{
+            return {
+                ...state,
+                blogs:state.blogs?.map(blog => blog?._id === payload.blogId? {...blog,comments:blog.comments.filter(comment => comment._id !== payload.commentId)} : blog)
+            }
+        }
+
+        case DELETE_COMMENT_FAILURE:{
+            return {
+                ...state,
+                isLoading:false,
+                error:payload,
             }
         }
 

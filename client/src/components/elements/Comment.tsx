@@ -11,20 +11,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { useAppDispatch } from "@/hooks/hooks";
-import { createComment } from "@/redux/actions/blogAction";
-import { MessageCircle } from "lucide-react";
+import { useAppDispatch, useAppSelector } from "@/hooks/hooks";
+import { createComment, deleteComment } from "@/redux/actions/blogAction";
+import { DeleteIcon, MessageCircle } from "lucide-react";
+import type { Comment } from "@/types";
 
 
-type Comment = {
-  _id: string;
-  text: string;
-  createdAt: string;
-  userId: {
-    name: string,
-    username: string
-  }
-};
+
 
 
 interface CommentDialogProps {
@@ -36,11 +29,15 @@ export function CommentDialog({ commentsData = [], blogId }: CommentDialogProps)
   const dispatch = useAppDispatch()
   const [open, setOpen] = React.useState(false);
   const [newComment, setNewComment] = React.useState("");
+  const { userData } = useAppSelector(state => state.auth)
   const handleAddComment = () => {
     dispatch(createComment(blogId, newComment))
     setNewComment("");
   };
-  console.log(newComment)
+
+  const commentDeleteHandler = (commentId:string) => {
+      dispatch(deleteComment(commentId,blogId))
+  }
 
 
 
@@ -60,19 +57,25 @@ export function CommentDialog({ commentsData = [], blogId }: CommentDialogProps)
         <div className="max-h-80 overflow-y-auto space-y-4 mb-4">
           {commentsData.length === 0 && <p>No comments yet.</p>}
           {commentsData.map((comment) => {
+            console.log(comment)
             return (
-              <div key={comment._id} className="flex items-start space-x-3">
-                <Avatar>
-                  <AvatarImage src="" alt={comment.userId?.name} />
-                  <AvatarFallback>{comment.userId?.name}</AvatarFallback>
-                </Avatar>
-                <div>
-                  <p className="font-semibold text-gray-900">{comment.userId?.username}</p>
-                  <p className="text-gray-700">{comment.text}</p>
-                  <p className="text-xs text-gray-500">
-                    {new Date(comment.createdAt).toLocaleString()}
-                  </p>
+              <div key={comment._id} className="flex  justify-between">
+                <div className="flex  gap-4">
+                  <Avatar>
+                    <AvatarImage src="" alt={comment.userId?.name} />
+                    <AvatarFallback>{comment.userId?.name}</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <p className="font-semibold text-gray-900">{comment.userId?.username}</p>
+                    <p className="text-gray-700">{comment.text}</p>
+                    <p className="text-xs text-gray-500">
+                      {new Date(comment.createdAt).toLocaleString()}
+                    </p>
+                  </div>
                 </div>
+                {comment?.userId?._id === userData?._id && <Button onClick={() => commentDeleteHandler(comment?._id)} variant='ghost' className="cursor-pointer text-blue-500 hover:scale-105 transform-3d delay-150 transition-shadow">
+                  <DeleteIcon />
+                </Button>}
               </div>
 
             )

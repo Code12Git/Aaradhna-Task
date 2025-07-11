@@ -2,10 +2,19 @@ const {responseManager, authManager, blogManager} = require('../services')
 
 const create = async(request,response) => {
     try{
-        const result = await blogManager.create(request.body,request.user)
+        const result = await blogManager.create(request.body,request.user,request.files)
         return responseManager.sendSuccessResponse(response,result,'Blog Created Successfully!')
     }catch(err){
         return responseManager.sendErrorResponse(response,err,'Cannot Create Blog')
+    }
+}
+
+const uploadImage = async(request,response) => {
+    try{
+        const result = await blogManager.uploadImage(request.files,request.params)
+        return responseManager.sendSuccessResponse(response,result,'Image Uploaded Successfully!')
+    }catch(err){
+        return responseManager.sendErrorResponse(response,err,'Error Updating Image')
     }
 }
 
@@ -56,6 +65,14 @@ const comment = async(request,response) => {
     }
 }
 
+const deleteComment = async(request,response) => {
+    try{
+        const result = await blogManager.deleteComment(request.params,request.user)
+        return responseManager.sendSuccessResponse(response,result,'Comment deleted successfully!')
+    }catch(err){
+        return responseManager.sendErrorResponse(response,err,'Error deleting comment')
+    }
+}
 
 const likes = async(request,response) => {
     try{
@@ -66,4 +83,4 @@ const likes = async(request,response) => {
     }
 }
 
-module.exports = { create,update, deleteOne, get, getAll,comment,likes }
+module.exports = { create,update, deleteOne, get, getAll,comment,likes, uploadImage, deleteComment }

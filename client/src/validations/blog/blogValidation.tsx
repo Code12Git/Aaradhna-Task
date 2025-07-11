@@ -1,4 +1,4 @@
-const z = require("zod");
+import z from "zod";
 
 const blogValidation = z.object({
   title: z.string({ required_error: "Title is required", invalid_type_error: "Title must be a string" })
@@ -12,6 +12,8 @@ const blogValidation = z.object({
     .trim(),
 
     img: z.string().optional()
+
+
 });
 
-module.exports = blogValidation;
+export default blogValidation;

@@ -3,16 +3,18 @@ import { thunk } from 'redux-thunk';
 import { persistStore, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 import authReducer from './reducers/authreducer';
-import { type authState } from '@/types';
+import blogReducer from './reducers/blogReducer'
+import { type authState, type blogState } from '@/types';
  
 const persistConfig = {
   key: 'root',
   storage,
-  whitelist: ['auth'],
+  whitelist: ['auth','blog'],
 };
 
 const rootReducer = combineReducers({
    auth: authReducer as unknown as Reducer<authState>,
+   blog:blogReducer as unknown as Reducer<blogState>
  });
 
 export type RootState = ReturnType<typeof rootReducer>;

@@ -1,0 +1,109 @@
+"use client";
+
+import * as React from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { useAppDispatch } from "@/hooks/hooks";
+import { createComment } from "@/redux/actions/blogAction";
+import { MessageCircle } from "lucide-react";
+
+
+type Comment = {
+  _id: string;
+  text: string;
+  createdAt: string;
+  userId: {
+    name: string,
+    username: string
+  }
+};
+
+
+interface CommentDialogProps {
+  commentsData: Comment[];
+  blogId: string;
+}
+
+export function CommentDialog({ commentsData = [], blogId }: CommentDialogProps) {
+  const dispatch = useAppDispatch()
+  const [open, setOpen] = React.useState(false);
+  const [newComment, setNewComment] = React.useState("");
+  const handleAddComment = () => {
+    dispatch(createComment(blogId, newComment))
+    setNewComment("");
+  };
+  console.log(newComment)
+
+
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant="outline" size="sm" className=" cursor-pointer text-indigo-600">
+          <MessageCircle size={18} /> Comments ({commentsData.length})
+        </Button>
+      </DialogTrigger>
+
+      <DialogContent className="sm:max-w-lg max-w-xs">
+        <DialogHeader>
+          <DialogTitle>Comments</DialogTitle>
+        </DialogHeader>
+
+        <div className="max-h-80 overflow-y-auto space-y-4 mb-4">
+          {commentsData.length === 0 && <p>No comments yet.</p>}
+          {commentsData.map((comment) => {
+            return (
+              <div key={comment._id} className="flex items-start space-x-3">
+                <Avatar>
+                  <AvatarImage src="" alt={comment.userId?.name} />
+                  <AvatarFallback>{comment.userId?.name}</AvatarFallback>
+                </Avatar>
+                <div>
+                  <p className="font-semibold text-gray-900">{comment.userId?.username}</p>
+                  <p className="text-gray-700">{comment.text}</p>
+                  <p className="text-xs text-gray-500">
+                    {new Date(comment.createdAt).toLocaleString()}
+                  </p>
+                </div>
+              </div>
+
+            )
+          })}
+        </div>
+
+        <form
+          className="flex space-x-2"
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleAddComment();
+          }}
+        >
+          <Input
+            placeholder="Add a comment..."
+            name="newComment"
+            value={newComment}
+            onChange={(e) => setNewComment(e.target.value)}
+          />
+          <Button
+            type="submit"
+            variant="default"
+            disabled={!newComment.trim()}
+          >
+            Send
+          </Button>
+        </form>
+
+
+
+      </DialogContent>
+    </Dialog>
+  );
+}

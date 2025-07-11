@@ -118,3 +118,7 @@
     @apply bg-background text-foreground;
   }
 }
+
+body {
+  @apply bg-gradient-to-r from-indigo-500 to-purple-600 min-h-screen;
+}

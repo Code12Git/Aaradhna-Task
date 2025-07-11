@@ -142,7 +142,8 @@ const BlogCard = () => {
                 >
                   <Heart
                     size={18}
-                    fill={blog.likes.includes(userData?._id) ? "red" : "transparent"}
+                    className={blog.likes.includes(userData?._id) ? "animate-pulse text-red-500" : "text-gray-400"}
+                    fill={blog.likes.includes(userData?._id) ? "red" : "transparent"}                    
                     />
                   <span className="text-sm font-medium">
                     {blog?.likes.length || 0}

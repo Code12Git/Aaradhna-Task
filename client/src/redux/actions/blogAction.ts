@@ -18,6 +18,10 @@ import {
   ADD_COMMENT_FAILURE,
   ADD_COMMENT_REQUEST,
   ADD_COMMENT_SUCCESS,
+  DELETE_BLOG_REQUEST,
+  DELETE_COMMENT_REQUEST,
+  DELETE_COMMENT_SUCCESS,
+  DELETE_COMMENT_FAILURE,
 } from '../actionTypes/actionTypes'
 import { type blogResponse } from '@/types';
 import { type ApiError } from '@/types';
@@ -49,7 +53,7 @@ export const fetchBlog = () => async (dispatch: Dispatch) => {
   }
 };
 
-export const likeBlog = (id: string): ThunkAction<Promise<void>, RootState, unknown, AnyAction> =>async (dispatch: ThunkDispatch<RootState, unknown, AnyAction>) => {
+export const likeBlog = (id: string) =>async (dispatch: Dispatch) => {
   dispatch({ type: LIKE_BLOG_REQUEST });
   console.log(id)
   try {
@@ -59,6 +63,7 @@ export const likeBlog = (id: string): ThunkAction<Promise<void>, RootState, unkn
       payload:{ likes:response.data?.data?.likes,id},
 
     });
+    toast.success('You have liked a post')
   } catch (err) {
     const error = err as ApiError;
     dispatch({
@@ -88,14 +93,13 @@ export const createBlog = (data: { title: string, description: string }) => asyn
   }
 }
 
-export const deleteBlog = (id: string,): ThunkAction<Promise<void>, RootState, unknown, AnyAction> =>async (dispatch: ThunkDispatch<RootState, unknown, AnyAction>) => {
-  dispatch({ type: DELETE_BLOG_FAILURE })
+export const deleteBlog = (id: string) => async (dispatch:Dispatch) =>{
+  dispatch({ type: DELETE_BLOG_REQUEST })
   try {
     await privateRequest.delete(`/blog/${id}`)
 
     dispatch({ type: DELETE_BLOG_SUCCESS, payload: {id} })
     toast.success('Blog deleted Successfully')
-    dispatch(fetchBlog())
   }
   catch (err) {
     const error = err as ApiError;
@@ -166,3 +170,22 @@ export const createComment = (
       toast.error(getApiErrorMessage(error));
     }
   };
+
+
+  export const deleteComment = (commentId: string,blogId:string) => async (dispatch: Dispatch) => {
+    console.log(commentId,blogId)
+    dispatch({ type: DELETE_COMMENT_REQUEST })
+    try {
+      await privateRequest.delete(`/blog/${blogId}/${commentId}/comment`)
+      dispatch({ type: DELETE_COMMENT_SUCCESS, payload: {blogId:blogId,commentId:commentId} })
+      toast.success('Comment deleted Successfully')
+    }
+    catch (err) {
+      const error = err as ApiError;
+      dispatch({
+        type: DELETE_COMMENT_FAILURE,
+        payload: error.response?.data?.code?.message || error.response?.data?.message || error.message || 'Error Deleting Blog'
+      });
+      toast.error(getApiErrorMessage(error));
+    }
+  }  

@@ -33,7 +33,7 @@ export interface ApiError {
       name:string,
       _id:string
     },
-    comments:string[],
+    comments:Comment[],
     likes:string[],
     title:string,
     description:string,
@@ -57,6 +57,17 @@ export interface ApiError {
       likes:string[]
     }
   }
+
+  export type Comment = {
+    _id: string;
+    text: string;
+    createdAt: string;
+    userId: {
+      name: string,
+      username: string,
+      _id:string,
+    }
+  };
 
   export interface authState {
     userData: User | {_id:string};  
@@ -86,5 +97,9 @@ export interface ApiError {
     _id?: string;
     error?:string;
     comments:string[];
-    likes:string[]
+    likes:string[];
+
+blogId:string;
+commentId:string;
+
   }

@@ -30,6 +30,9 @@ export function CommentDialog({ commentsData = [], blogId }: CommentDialogProps)
   const [open, setOpen] = React.useState(false);
   const [newComment, setNewComment] = React.useState("");
   const { userData } = useAppSelector(state => state.auth)
+
+
+
   const handleAddComment = () => {
     dispatch(createComment(blogId, newComment))
     setNewComment("");
@@ -98,6 +101,7 @@ export function CommentDialog({ commentsData = [], blogId }: CommentDialogProps)
           <Button
             type="submit"
             variant="default"
+            className="cursor-pointer"
             disabled={!newComment.trim()}
           >
             Send

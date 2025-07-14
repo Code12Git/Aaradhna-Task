@@ -9,18 +9,11 @@ const create = async(request,response) => {
     }
 }
 
-const uploadImage = async(request,response) => {
-    try{
-        const result = await blogManager.uploadImage(request.files,request.params)
-        return responseManager.sendSuccessResponse(response,result,'Image Uploaded Successfully!')
-    }catch(err){
-        return responseManager.sendErrorResponse(response,err,'Error Updating Image')
-    }
-}
+
 
 const update = async(request,response) => {
     try{
-        const result = await blogManager.update(request.body,request.params,request.user)
+        const result = await blogManager.update(request.body,request.params,request.user,request.files)
         return responseManager.sendSuccessResponse(response,result,'Blog Updated successfull')
     }catch(err){
         return responseManager.sendErrorResponse(response,err,'Error updating blog')
@@ -83,4 +76,4 @@ const likes = async(request,response) => {
     }
 }
 
-module.exports = { create,update, deleteOne, get, getAll,comment,likes, uploadImage, deleteComment }
+module.exports = { create,update, deleteOne, get, getAll,comment,likes, deleteComment }

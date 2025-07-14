@@ -1,6 +1,6 @@
 const express = require('express');
 const { fromEnv } = require('./utils');
- const { logger } = require('./utils');
+const { logger } = require('./utils');
 const connectDB = require('./config/connection');
 const routes = require('./routes');
 const cors = require('cors');

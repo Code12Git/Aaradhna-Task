@@ -14,12 +14,15 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useAppDispatch } from '@/hooks/hooks'
 import { loginUser } from '@/redux/actions/authAction'
+import { Link, useNavigate } from 'react-router-dom'
 
-type loginForm = z.infer<typeof loginValidation>
+type LoginForm = z.infer<typeof loginValidation>
 
 const Login = () => {
   const dispatch = useAppDispatch()
-  const form = useForm<loginForm>({
+  const navigate = useNavigate();
+
+  const form = useForm<LoginForm>({
     resolver: zodResolver(loginValidation),
     defaultValues: {
       email: '',
@@ -27,8 +30,13 @@ const Login = () => {
     },
   })
 
-  const onSubmit = async (values: loginForm) => {
-        dispatch(loginUser(values))
+  const onSubmit = async (values: LoginForm) => {
+    try {
+      await dispatch(loginUser(values,navigate))
+      
+    } catch (error) {
+      console.error('Login error:', error)
+    }
   }
 
   return (
@@ -66,7 +74,17 @@ const Login = () => {
               )}
             />
 
-            <Button type="submit" className="w-full mt-4 cursor-pointer" disabled={form.formState.isSubmitting}>
+            <div className="text-sm text-right">
+              <Link to="/register" className="text-indigo-600 hover:underline">
+                Not registered? Sign up
+              </Link>
+            </div>
+
+            <Button
+              type="submit"
+              className="w-full mt-4"
+              disabled={form.formState.isSubmitting}
+            >
               {form.formState.isSubmitting ? 'Logging in...' : 'Login'}
             </Button>
           </form>

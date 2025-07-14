@@ -14,6 +14,7 @@ import { z } from 'zod'
 import registerValidation from '@/validations/auth/registerValidation'
 import { registerUser } from '@/redux/actions/authAction'
 import { useAppDispatch } from '@/hooks/hooks'
+import { Link, useNavigate } from 'react-router-dom'
 
 type registerForm = z.infer<typeof registerValidation>
 
@@ -25,6 +26,7 @@ type FieldName = typeof fields[number];
 
 const Register = () => {
   const dispatch = useAppDispatch()
+  const navigate = useNavigate();
   const form = useForm<registerForm>({
     resolver: zodResolver(registerValidation),
     defaultValues: {
@@ -37,7 +39,7 @@ const Register = () => {
   })
 
   const onSubmit = async (values: registerForm) => {
-      await dispatch(registerUser(values))
+      await dispatch(registerUser(values,navigate))
       form.reset()
   }
 
@@ -71,6 +73,11 @@ const Register = () => {
                 )}
               />
             ))}
+             <div className="text-sm text-right">
+              <Link to="/login" className="text-indigo-600 hover:underline">
+                Already registered? Login
+              </Link>
+            </div>
             <Button type="submit" className="w-full mt-4 cursor-pointer" disabled={form.formState.isSubmitting}>
               {form.formState.isSubmitting ? 'Registering...' : 'Register'}
             </Button>

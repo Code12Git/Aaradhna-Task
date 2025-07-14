@@ -1,5 +1,5 @@
-import { type AnyAction, type Dispatch } from 'redux';
-import { formRequest, privateRequest, publicRequest } from '@/helpers/axios';
+import {  type Dispatch } from 'redux';
+import {  privateRequest, publicRequest } from '@/helpers/axios';
 import {
   FETCH_BLOG_REQUEST,
   FETCH_BLOG_SUCCESS,
@@ -27,8 +27,6 @@ import { type blogResponse } from '@/types';
 import { type ApiError } from '@/types';
 import toast from 'react-hot-toast'
 import { getApiErrorMessage } from '@/utils/errorHandler';
-import type { ThunkAction, ThunkDispatch } from 'redux-thunk';
-import type { RootState } from '../store';
 
 
 export const fetchBlog = () => async (dispatch: Dispatch) => {
@@ -63,7 +61,6 @@ export const likeBlog = (id: string) =>async (dispatch: Dispatch) => {
       payload:{ likes:response.data?.data?.likes,id},
 
     });
-    toast.success('You have liked a post')
   } catch (err) {
     const error = err as ApiError;
     dispatch({
@@ -75,7 +72,7 @@ export const likeBlog = (id: string) =>async (dispatch: Dispatch) => {
 };
 
 
-export const createBlog = (data: { title: string, description: string }) => async (dispatch: Dispatch) => {
+export const createBlog = (data: { title: string; description: string; img?: File }) => async (dispatch: Dispatch) => {
   console.log(data)
   dispatch({ type: CREATE_BLOG_REQUEST })
   try {
@@ -111,7 +108,7 @@ export const deleteBlog = (id: string) => async (dispatch:Dispatch) =>{
   }
 }
 
-export const updateBlog = (data: { title: string, description: string }, id: string) => async (dispatch: Dispatch) => {
+export const updateBlog = (data: FormData | { title: string; description: string }, id: string) => async (dispatch: Dispatch) => {
   console.log(data, id)
   dispatch({ type: UPDATE_BLOG_REQUEST })
   try {
@@ -130,21 +127,10 @@ export const updateBlog = (data: { title: string, description: string }, id: str
 }
 
 
-export const uploadImage = (img: File, id: string) => async (dispatch: Dispatch) => {
-
-  const upload = await formRequest.post(`/blog/upload-image/${id}`, img)
-  console.log(upload)
-
-}
 
 
-export const createComment = (
-  id: string,
-  data: string
-): ThunkAction<Promise<void>, RootState, unknown, AnyAction> =>
-  async (dispatch: ThunkDispatch<RootState, unknown, AnyAction>) => {
+export const createComment = (id: string,data: string) => async (dispatch: Dispatch) => {
     dispatch({ type: ADD_COMMENT_REQUEST });
-    console.log(id, data);
     try {
       const res = await privateRequest.post(`/blog/${id}/comments`, { text: data });
       console.log(res);
@@ -155,7 +141,6 @@ export const createComment = (
           id,
         },
       });
-      dispatch(fetchBlog());
       toast.success('Comment Added Successfully');
     } catch (err) {
       const error = err as ApiError;

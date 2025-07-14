@@ -6,6 +6,7 @@ import {
   LOGIN_REQUEST,
   LOGIN_SUCCESS,
   LOGIN_FAILURE,
+  LOGOUT,
 
 } from "../actionTypes/actionTypes";
 
@@ -64,6 +65,16 @@ const authReducer = (state = initialState, { type, payload }: { type: string; pa
         isLoading: false,
         error: payload
       };
+
+      // Logout
+    case LOGOUT :
+      return {
+        ...state,
+        userData: null,
+        token: null,
+        isAuthenticated: false,
+      };
+
 
 
     default:

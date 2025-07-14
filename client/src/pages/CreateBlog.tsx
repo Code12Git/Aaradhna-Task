@@ -32,15 +32,17 @@ type FieldName = typeof fields[number];
 export default function CreateBlog() {
   const dispatch = useAppDispatch()
   const [file, setFile] = useState<File | null>(null);
-  const [isSuggesting, setIsSuggesting] = useState(false);
+  const [suggestedTitle,setSuggestedTitle] = useState('')
+  const [suggestedDescription,setSuggestedDescription] = useState('')
   const form = useForm<blogForm>({
     resolver: zodResolver(blogValidation),
     defaultValues: {
-      title: '',
-      description: '',
+      title: suggestedTitle || '',
+      description: suggestedDescription || '',
       img: '',
     },
   });
+
 
   const onBlogSubmit = (value: blogForm) => {
     const formData = new FormData();
@@ -51,22 +53,14 @@ export default function CreateBlog() {
   };
 
   const suggestBlogData = async() => {
-    try {
-      setIsSuggesting(true);
-      const responseText = await suggestedBlog();
-      const blogData = {
-        title: responseText?.match(/Title: (.+)/)?.[1] || "No title generated",
-        description: responseText?.match(/Description: (.+)/s)?.[1]?.trim() || "No description generated"
-      };
-      
-      // Update form values directly
-      form.setValue('title', blogData.title);
-      form.setValue('description', blogData.description);
-    } catch (error) {
-      console.error("Error suggesting blog:", error);
-    } finally {
-      setIsSuggesting(false);
-    }
+    
+    const responseText = await suggestedBlog()
+    const blogData = {
+      title: responseText?.match(/Title: (.+)/)?.[1] || "No title generated",
+      description: responseText?.match(/Description: (.+)/s)?.[1]?.trim() || "No description generated"
+    };
+    setSuggestedTitle(blogData?.title)
+    setSuggestedDescription(blogData?.description)
   }
 
   return (
@@ -80,45 +74,45 @@ export default function CreateBlog() {
             <form onSubmit={form.handleSubmit(onBlogSubmit)} className="space-y-4">
               {fields.map((fieldName: FieldName) => (
                 <FormField
-                  key={fieldName}
-                  control={form.control}
-                  name={fieldName}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>
-                        {fieldName.charAt(0).toUpperCase() + fieldName.slice(1)}
-                      </FormLabel>
-                      <FormControl>
-                        {fieldName === 'img' ? (
-                          <Input
-                            type="file"
-                            className="cursor-pointer"
-                            onChange={(e) => {
-                              const selectedFile = e.target.files?.[0];
-                              if (selectedFile) {
-                                setFile(selectedFile);
-                                form.setValue('img', selectedFile.name); 
-                              }
-                            }}
-                          />
-                        ) : fieldName === 'description' ? (
-                          <Textarea
-                            placeholder={`Enter your ${fieldName}`}
-                            {...field}
-                          />
-                        ) : (
-                          <Input
-                            type="text"
-                            placeholder={`Enter your ${fieldName}`}
-                            {...field}
-                          />
-                        )}
-                      </FormControl>
-                      {fieldName !== 'img' && <FormMessage />}
-                    </FormItem>
-                  )}
-                />
-              ))}
+                key={fieldName}
+                control={form.control}
+                name={fieldName}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      {fieldName.charAt(0).toUpperCase() + fieldName.slice(1)}
+                    </FormLabel>
+                    <FormControl>
+                      {fieldName === 'img' ? (
+                        <Input
+                          type="file"
+                          className="cursor-pointer"
+                          onChange={(e) => {
+                            const selectedFile = e.target.files?.[0];
+                            if (selectedFile) {
+                              setFile(selectedFile);
+                              form.setValue('img', selectedFile.name); 
+                            }
+                          }}
+                        />
+                      ) : fieldName === 'description' ? (
+                        <Textarea
+                          placeholder={`Enter your ${fieldName}`}
+                          {...field}
+                        />
+                      ) : (
+                        <Input
+                          type="text"
+                          placeholder={`Enter your ${fieldName}`}
+                          {...field}
+                        />
+                      )}
+                    </FormControl>
+                    {fieldName !== 'img' && <FormMessage />}
+                  </FormItem>
+                )}
+              />
+            ))}
               <Button
                 type="submit"
                 className="w-full mt-4 cursor-pointer"
@@ -130,9 +124,9 @@ export default function CreateBlog() {
                 type="button"
                 onClick={suggestBlogData}
                 className="w-full mt-4 cursor-pointer bg-red-400 hover:bg-red-500 transition hover:scale-105 delay-150"
-                disabled={isSuggesting}
+                
               >
-                {isSuggesting ? 'Generating suggestions...' : 'Suggest AI-based title and content'}
+                Suggest ai based based title and content
               </Button>
             </form>
           </Form>

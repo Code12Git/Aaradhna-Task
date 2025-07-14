@@ -85,15 +85,20 @@ const authReducer = (state = initialState, { type, payload }: { type: string; pa
             }
         }  
 
-        case UPDATE_BLOG_SUCCESS:{
-            console.log(payload)
+        case UPDATE_BLOG_SUCCESS: {
             return {
                 ...state,
                 blogs: state.blogs?.map(blog => 
-                    blog._id === payload._id ? payload : blog
+                    blog._id === payload._id 
+                        ? { 
+                            ...blog, 
+                            ...payload,
+                            userId: payload.userId || blog.userId 
+                        } 
+                        : blog
                 ),
-            }
-        }  
+            };
+        }
           
         case UPDATE_BLOG_FAILURE:{
             return {

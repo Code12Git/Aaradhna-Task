@@ -13,7 +13,6 @@ const blogValidation = z.object({
 
     img: z.string().optional()
 
-
 });
 
 export default blogValidation;

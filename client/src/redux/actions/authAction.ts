@@ -12,8 +12,9 @@ import { type AuthResponse,type UserCredentials } from '@/types';
 import {type  ApiError } from '@/types';
 import toast from 'react-hot-toast'
 import { getApiErrorMessage } from '@/utils/errorHandler';
+import type { NavigateFunction } from 'react-router-dom';
 
-export const registerUser = (data: UserCredentials) => async (dispatch: Dispatch) => {
+export const registerUser = (data: UserCredentials,navigate: NavigateFunction) => async (dispatch: Dispatch) => {
   dispatch({ type: REGISTER_REQUEST });
   try {
     const response = await publicRequest.post<AuthResponse>('/auth/register', data);
@@ -26,6 +27,7 @@ export const registerUser = (data: UserCredentials) => async (dispatch: Dispatch
       }
     });
     toast.success("User Registered Successfully")
+    navigate('/login')
   } catch (err) {
     const error = err as ApiError;
     console.log(error)
@@ -40,7 +42,7 @@ export const registerUser = (data: UserCredentials) => async (dispatch: Dispatch
   }
 };
 
-export const loginUser = (credentials: { email: string; password: string }) => async (dispatch: Dispatch) => {
+export const loginUser = (credentials: { email: string; password: string },navigate: NavigateFunction) => async (dispatch: Dispatch) => {
   dispatch({ type: LOGIN_REQUEST });
   try {
     const response = await publicRequest.post('/auth/login', credentials);
@@ -53,6 +55,7 @@ export const loginUser = (credentials: { email: string; password: string }) => a
       }
     });
     toast.success("User Logged In Successfully")
+    navigate('/')
   } catch (err) {
     const error = err as ApiError;
     dispatch({
@@ -64,4 +67,9 @@ export const loginUser = (credentials: { email: string; password: string }) => a
     });
     toast.error(getApiErrorMessage(error))
   }
+};
+
+export const logout = () => (dispatch:Dispatch) => {
+  localStorage.removeItem("persist:root"); 
+  dispatch({ type: "LOGOUT" });
 };

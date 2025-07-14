@@ -1,4 +1,6 @@
 const express = require('express');
+const swaggerUi = require("swagger-ui-express");
+const swaggerSpec = require("./swagger/swaggerConfig");
 const { fromEnv } = require('./utils');
 const { logger } = require('./utils');
 const connectDB = require('./config/connection');
@@ -39,6 +41,8 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 app.use(express.json());
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
 app.use('/api', routes);
 
 
@@ -57,4 +61,5 @@ app.get('/', (req, res) => {
 
 app.listen(PORT, () => {
   logger.info(`🚀 Server running at http://localhost:${PORT}`);
+  logger.info(`Swagger docs at http://localhost:${PORT}/api-docs`);
 });

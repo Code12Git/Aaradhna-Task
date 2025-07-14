@@ -3,7 +3,7 @@
 A full-stack blog application built for the Aradhana Labs internship assignment, featuring authentication, blog posts, comments, and likes with optional AI integration.
 
 ## 🌐 Live Demo (Optional)
-🔗 [Deployed Application Link](https://aaradhna-task.vercel.app/login) 
+🔗 [Deployed Link](https://aaradhna-task.vercel.app/login) 
 
 ## 🛠️ Tech Stack
 
@@ -70,8 +70,18 @@ cd client
 npm install
 cp .env
 npm run dev
-
 ```
+
+### 📚 API Documentation
+We use Swagger for comprehensive API documentation:
+- **Local Access**: `http://localhost:3001/api-docs`
+- **Features**:
+  - Test endpoints directly
+  - Sample model schemas
+  - JWT authentication support
+
+
+
 
 ## 📂 Project Structure
 
@@ -85,6 +95,7 @@ server/
     ├── models/              # Database models (e.g. Mongoose)
     ├── routes/              # Express route definitions
     ├── services/            # Reusable business logic (blog,auth etc.)
+    ├── swagger/             # Swagger documentation of apis
     ├── utils/               # Utility/helper functions
     ├── validations/         # Request data validation schema. (Zod, etc.)
     └── server.js            # Entry point for server (Express setup)

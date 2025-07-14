@@ -21,7 +21,7 @@ const options = {
 
 ### Built With:
 - Node.js & Express
-- PostgreSQL database
+- Mongodb database
 - JWT authentication
 `,
       contact: {

@@ -58,7 +58,6 @@ const BlogCard = () => {
 
       <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
         {blogs?.map((blog) => {
-          console.log(blog)
           return (
           <Card
             key={blog._id}

@@ -5,9 +5,7 @@ const verifyData = (schema) => async (req, res, next) => {
     if (!schema || typeof schema.parse !== "function") {
       throw new Error("Invalid schema: Missing parse method");
     }
-    console.log(req.body)
     const parsedBody = schema.parse(req.body);
-    console.log(parsedBody)
     req.body = parsedBody;
     next();
   } catch (err) {

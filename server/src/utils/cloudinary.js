@@ -3,7 +3,6 @@ const fromEnv = require("./fromEnv");
 const fs = require("fs");
 
 const uploadImages = async (localFilePath) => {
-    console.log(localFilePath)
   cloudinary.config({
     cloud_name: fromEnv("CLOUD_NAME"),
     api_key: fromEnv("API_KEY"),
@@ -14,7 +13,6 @@ const uploadImages = async (localFilePath) => {
     const response = await cloudinary.uploader.upload(localFilePath, {
       resource_type: "auto",
     });
-    console.log(response)
     fs.unlinkSync(localFilePath);
     return response;
   } catch (error) {

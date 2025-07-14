@@ -36,7 +36,6 @@ export async function suggestedBlog() {
                         }]
                       }                }
             });
-            console.log(response.text)
             return response.text;
         } catch(err) {
             console.log(err);

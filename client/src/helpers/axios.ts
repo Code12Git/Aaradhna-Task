@@ -22,7 +22,7 @@ privateRequest.interceptors.request.use((config) => {
       }
     }
   } catch (error) {
-    console.log(error)
+    console.error(error)
   }
   return config;
 }, error => Promise.reject(error));

@@ -18,7 +18,6 @@ export const registerUser = (data: UserCredentials,navigate: NavigateFunction) =
   dispatch({ type: REGISTER_REQUEST });
   try {
     const response = await publicRequest.post<AuthResponse>('/auth/register', data);
-    console.log(response)
     dispatch({ 
       type: REGISTER_SUCCESS, 
       payload: {
@@ -30,7 +29,6 @@ export const registerUser = (data: UserCredentials,navigate: NavigateFunction) =
     navigate('/login')
   } catch (err) {
     const error = err as ApiError;
-    console.log(error)
     dispatch({
       type: REGISTER_FAILURE,
       payload: error.response?.data?.code?.message || 
@@ -46,7 +44,6 @@ export const loginUser = (credentials: { email: string; password: string },navig
   dispatch({ type: LOGIN_REQUEST });
   try {
     const response = await publicRequest.post('/auth/login', credentials);
-    console.log(response)
     dispatch({
       type: LOGIN_SUCCESS,
       payload: {

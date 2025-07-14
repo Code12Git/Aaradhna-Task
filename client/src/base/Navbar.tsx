@@ -57,7 +57,7 @@ export default function Navbar() {
                 </Link>
               ))}
 
-              {/* Logout Button with nice hover effect */}
+              {/* Logout Button  */}
               <Button
                 variant="ghost"
                 onClick={handleLogout}

@@ -6,7 +6,6 @@ const { CONFLICT, NOT_FOUND, INVALID_REQUEST_DATA } = require("../utils/errors")
 
 const create = async (body,user,files) => {
     const {title,description,img} = body;
-    console.log("Title",title,"description",description,"Img",img);
     try{
         const blogExist =  await blogModel.findOne({userId:user._id,title})
         if(blogExist) throw new AppError({...CONFLICT,message:'Blog already created by you using same title or description'})

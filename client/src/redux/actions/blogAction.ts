@@ -40,7 +40,6 @@ export const fetchBlog = () => async (dispatch: Dispatch) => {
     });
   } catch (err) {
     const error = err as ApiError;
-    console.log(error)
     dispatch({
       type: FETCH_BLOG_FAILURE,
       payload: error.response?.data?.code?.message ||
@@ -53,7 +52,6 @@ export const fetchBlog = () => async (dispatch: Dispatch) => {
 
 export const likeBlog = (id: string) =>async (dispatch: Dispatch) => {
   dispatch({ type: LIKE_BLOG_REQUEST });
-  console.log(id)
   try {
     const response = await privateRequest.post<blogResponse>(`/blog/${id}/likes`);
     dispatch({
@@ -72,12 +70,10 @@ export const likeBlog = (id: string) =>async (dispatch: Dispatch) => {
 };
 
 
-export const createBlog = (data: { title: string; description: string; img?: File }) => async (dispatch: Dispatch) => {
-  console.log(data)
+export const createBlog = (data: { title: string; description: string; img?: File } | FormData) => async (dispatch: Dispatch) => {
   dispatch({ type: CREATE_BLOG_REQUEST })
   try {
     const res = await privateRequest.post('/blog', data)
-    console.log(res)
     dispatch({ type: CREATE_BLOG_SUCCESS, payload: res.data.data })
     toast.success('Blog Created Successfully')
   } catch (err) {
@@ -109,11 +105,9 @@ export const deleteBlog = (id: string) => async (dispatch:Dispatch) =>{
 }
 
 export const updateBlog = (data: FormData | { title: string; description: string }, id: string) => async (dispatch: Dispatch) => {
-  console.log(data, id)
   dispatch({ type: UPDATE_BLOG_REQUEST })
   try {
     const res = await privateRequest.put(`/blog/${id}`, data)
-    console.log(res)
     dispatch({ type: UPDATE_BLOG_SUCCESS, payload: res.data.data })
     toast.success('Blog Updated Successfully')
   } catch (err) {
@@ -133,7 +127,6 @@ export const createComment = (id: string,data: string) => async (dispatch: Dispa
     dispatch({ type: ADD_COMMENT_REQUEST });
     try {
       const res = await privateRequest.post(`/blog/${id}/comments`, { text: data });
-      console.log(res);
       dispatch({
         type: ADD_COMMENT_SUCCESS,
         payload: {
@@ -158,7 +151,6 @@ export const createComment = (id: string,data: string) => async (dispatch: Dispa
 
 
   export const deleteComment = (commentId: string,blogId:string) => async (dispatch: Dispatch) => {
-    console.log(commentId,blogId)
     dispatch({ type: DELETE_COMMENT_REQUEST })
     try {
       await privateRequest.delete(`/blog/${blogId}/${commentId}/comment`)

@@ -30,38 +30,51 @@ const fields = ['title', 'description', 'img'] as const;
 type FieldName = typeof fields[number];
 
 export default function CreateBlog() {
-  const dispatch = useAppDispatch()
+  const dispatch = useAppDispatch();
   const [file, setFile] = useState<File | null>(null);
-  const [suggestedTitle,setSuggestedTitle] = useState('')
-  const [suggestedDescription,setSuggestedDescription] = useState('')
+  const [isSuggesting, setIsSuggesting] = useState(false); // Added missing state
+
   const form = useForm<blogForm>({
     resolver: zodResolver(blogValidation),
     defaultValues: {
-      title: suggestedTitle || '',
-      description: suggestedDescription || '',
+      title: '',
+      description: '',
       img: '',
     },
   });
-
 
   const onBlogSubmit = (value: blogForm) => {
     const formData = new FormData();
     formData.append('title', value.title);
     formData.append('description', value.description);
-    formData.append('img', file);
-    dispatch(createBlog(formData))
+    if (file) {
+      formData.append('img', file);
+    }
+    dispatch(createBlog(formData));
   };
 
-  const suggestBlogData = async() => {
-    
-    const responseText = await suggestedBlog()
-    const blogData = {
-      title: responseText?.match(/Title: (.+)/)?.[1] || "No title generated",
-      description: responseText?.match(/Description: (.+)/s)?.[1]?.trim() || "No description generated"
-    };
-    setSuggestedTitle(blogData?.title)
-    setSuggestedDescription(blogData?.description)
-  }
+  const suggestBlogData = async () => {
+    try {
+      setIsSuggesting(true);
+      const responseText = await suggestedBlog();
+      
+      // More robust extraction
+      const titleMatch = responseText?.match(/Title:\s*(.+?)(?:\n|Description:|$)/s);
+      const descMatch = responseText?.match(/Description:\s*(.+)/s);
+      
+      const blogData = {
+        title: titleMatch?.[1]?.trim() || "No title generated",
+        description: descMatch?.[1]?.trim() || "No description generated"
+      };
+      
+      form.setValue('title', blogData.title);
+      form.setValue('description', blogData.description);
+    } catch (error) {
+      console.error("Error suggesting blog:", error);
+    } finally {
+      setIsSuggesting(false);
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
@@ -74,60 +87,66 @@ export default function CreateBlog() {
             <form onSubmit={form.handleSubmit(onBlogSubmit)} className="space-y-4">
               {fields.map((fieldName: FieldName) => (
                 <FormField
-                key={fieldName}
-                control={form.control}
-                name={fieldName}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>
-                      {fieldName.charAt(0).toUpperCase() + fieldName.slice(1)}
-                    </FormLabel>
-                    <FormControl>
-                      {fieldName === 'img' ? (
-                        <Input
-                          type="file"
-                          className="cursor-pointer"
-                          onChange={(e) => {
-                            const selectedFile = e.target.files?.[0];
-                            if (selectedFile) {
-                              setFile(selectedFile);
-                              form.setValue('img', selectedFile.name); 
-                            }
-                          }}
-                        />
-                      ) : fieldName === 'description' ? (
-                        <Textarea
-                          placeholder={`Enter your ${fieldName}`}
-                          {...field}
-                        />
-                      ) : (
-                        <Input
-                          type="text"
-                          placeholder={`Enter your ${fieldName}`}
-                          {...field}
-                        />
-                      )}
-                    </FormControl>
-                    {fieldName !== 'img' && <FormMessage />}
-                  </FormItem>
-                )}
-              />
-            ))}
-              <Button
-                type="submit"
-                className="w-full mt-4 cursor-pointer"
-                disabled={form.formState.isSubmitting}
-              >
-                {form.formState.isSubmitting ? 'Creating...' : 'Create'}
-              </Button>
-              <Button
-                type="button"
-                onClick={suggestBlogData}
-                className="w-full mt-4 cursor-pointer bg-red-400 hover:bg-red-500 transition hover:scale-105 delay-150"
-                
-              >
-                Suggest ai based based title and content
-              </Button>
+                  key={fieldName}
+                  control={form.control}
+                  name={fieldName}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        {fieldName.charAt(0).toUpperCase() + fieldName.slice(1)}
+                      </FormLabel>
+                      <FormControl>
+                        {fieldName === 'img' ? (
+                          <Input
+                            type="file"
+                            accept="image/*"
+                            className="cursor-pointer"
+                            onChange={(e) => {
+                              const selectedFile = e.target.files?.[0];
+                              if (selectedFile) {
+                                setFile(selectedFile);
+                                form.setValue('img', selectedFile.name, { shouldValidate: true });
+                              } else {
+                                setFile(null);
+                                form.setValue('img', '', { shouldValidate: true });
+                              }
+                            }}
+                          />
+                        ) : fieldName === 'description' ? (
+                          <Textarea
+                            placeholder={`Enter your ${fieldName}`}
+                            {...field}
+                          />
+                        ) : (
+                          <Input
+                            type="text"
+                            placeholder={`Enter your ${fieldName}`}
+                            {...field}
+                          />
+                        )}
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              ))}
+              <div className="flex gap-4">
+                <Button
+                  type="submit"
+                  className="flex-1 mt-4 cursor-pointer"
+                  disabled={form.formState.isSubmitting}
+                >
+                  {form.formState.isSubmitting ? 'Creating...' : 'Create'}
+                </Button>
+                <Button
+                  type="button"
+                  onClick={suggestBlogData}
+                  className="flex-1 mt-4 cursor-pointer bg-red-400 hover:bg-red-500 transition hover:scale-105 delay-150"
+                  disabled={isSuggesting}
+                >
+                  {isSuggesting ? 'Generating...' : 'AI Suggestions'}
+                </Button>
+              </div>
             </form>
           </Form>
         </CardContent>

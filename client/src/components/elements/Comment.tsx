@@ -60,7 +60,6 @@ export function CommentDialog({ commentsData = [], blogId }: CommentDialogProps)
         <div className="max-h-80 overflow-y-auto space-y-4 mb-4">
           {commentsData.length === 0 && <p>No comments yet.</p>}
           {commentsData.map((comment) => {
-            console.log(comment)
             return (
               <div key={comment._id} className="flex  justify-between">
                 <div className="flex  gap-4">

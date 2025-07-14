@@ -21,7 +21,6 @@ const authReducer = (state = initialState, { type, payload }: { type: string; pa
           
         
         case FETCH_BLOG_SUCCESS: {
-            console.log(payload)
             return {
                 blogs:payload,
                 isLoading:false
@@ -63,7 +62,6 @@ const authReducer = (state = initialState, { type, payload }: { type: string; pa
         }  
 
         case DELETE_BLOG_SUCCESS:{
-            console.log(payload)
             return {
                 ...state,
                 blogs:state.blogs?.filter(blog => blog._id !== payload.id)
@@ -117,7 +115,6 @@ const authReducer = (state = initialState, { type, payload }: { type: string; pa
           
 
         case LIKE_BLOG_SUCCESS:{
-            console.log(payload)
             return{
                 isLoading:false,
                 blogs:state.blogs?.map(blog=>blog?._id === payload.id ? { ...blog, likes: payload.likes }:blog)

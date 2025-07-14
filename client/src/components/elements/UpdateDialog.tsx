@@ -72,14 +72,9 @@ const UpdateDialog = ({ blog }: { blog: Blog }) => {
             formData.append('img', file);
         }
 
-        console.log('Dispatching update with:', { 
-            title: values.title, 
-            hasFile: Boolean(file),
-            blogId: blog._id
-        });
 
-        const result = await dispatch(updateBlog(formData, blog._id));
-        console.log('Update result:', result);
+
+       await dispatch(updateBlog(formData, blog._id));
         
     } catch (error) {
         console.error("Full update error:", {

@@ -70,7 +70,7 @@ export interface ApiError {
   };
 
   export interface authState {
-    userData: User | {_id:string};  
+    userData: User | {_id:string} | null;  
     isLoading: boolean;
     error: string | null;   
     isAuthenticated: boolean;
@@ -93,6 +93,7 @@ export interface ApiError {
 
   export interface blogPayload {
     blog?:Blog;
+    userId:string;
     id?:string;
     _id?: string;
     error?:string;

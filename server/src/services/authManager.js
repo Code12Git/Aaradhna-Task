@@ -7,8 +7,8 @@ const jwt = require("jsonwebtoken");
 const register = async (body) => {
   const { name, email, username, password } = body;
   try {
-    const user = await userModel.findOne({ email });
-    if (user) throw new AppError({ ...CONFLICT, message: "User Already Exists" });
+    const user = await userModel.findOne({ $or: [{ email: email }, { username: username }] });
+    if (user) throw new AppError({ ...CONFLICT, message: "Username or email Already Exists" });
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = await userModel.create({

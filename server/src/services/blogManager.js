@@ -6,13 +6,12 @@ const { CONFLICT, NOT_FOUND, INVALID_REQUEST_DATA } = require("../utils/errors")
 
 const create = async (body,user,files) => {
     const {title,description,img} = body;
-    console.log('Title',title,"Description",description,"Image",img)
+    console.log("Title",title,"description",description,"Img",img);
     try{
         const blogExist =  await blogModel.findOne({userId:user._id,title})
         if(blogExist) throw new AppError({...CONFLICT,message:'Blog already created by you using same title or description'})
             let imgUrl = null;
             if (files && files.img) {
-                console.log(files)
                 const imgLocalPath = files.img[0].path;
                 const uploadedImage = await uploadImages(imgLocalPath);
                 
@@ -30,59 +29,46 @@ const create = async (body,user,files) => {
 
 
 
-const uploadImage = async (files, params) => {
-    const {blogId} = params;
+
+
+const update = async (body, params, user, files) => {
+    const { title, description } = body;
+    const { id } = params;
+    
     try {
-        if (!files || !files.img || files.img.length === 0) {
-            throw new AppError({ ...NOT_FOUND, message: "Image file not provided" });
+        if (!title?.trim() && !description?.trim()) {
+            throw new AppError({ ...INVALID_REQUEST_DATA, message: 'At least one of title or description is required' });
         }
-        
-        if (!blogId) {
-            throw new AppError({ ...BAD_REQUEST, message: "User ID is required" });
-        }
-        
-      const imgLocalPath = files.img[0].path;
-      
-      const uploadedImage = await uploadImages(imgLocalPath);
-  
-      if (!uploadedImage || !uploadedImage.url) {
-        throw new AppError({
-          ...BAD_REQUEST,
-          message: "Failed to upload image to Cloudinary",
-        });
-      }
-      const updatedUser = await blogModel.findByIdAndUpdate(
-        blogId,
-        { img: uploadedImage.url },
-        { new: true, runValidators: true }
-      );
-  
-      if (!updatedUser) {
-        throw new AppError({
-          ...NOT_FOUND,
-          message: "User not found or failed to update avatar",
-        });
-      }
-  
-      return updatedUser;
-  
-    } catch (err) {
-      throw err;
-    }
-  };
 
-
-
-const update = async(body,params,user) => {
-    const {title,description} = body;
-    const {id} = params;
-    try{
-        if (!title?.trim() && !description?.trim()) throw new AppError({ ...INVALID_REQUEST_DATA, message: 'At least one of title or description is required' });
         const blogExist = await blogModel.findOne({ _id: id, userId: user._id });
-        if(!blogExist) throw new AppError({...NOT_FOUND,message:'Blog not found'})
-        const updateBlog = await blogModel.findOneAndUpdate({_id:id,userId:user._id},{title,description},{new:true,runValidators:false})
-        return updateBlog;   
-    }catch(err){
+        if (!blogExist) throw new AppError({...NOT_FOUND, message: 'Blog not found'});
+
+        // Initialize update object with existing image
+        const updateData = {
+            title: title || blogExist.title,
+            description: description || blogExist.description,
+            img: blogExist.img // Start with existing image
+        };
+
+        // Only update image if new one is provided
+        if (files && files.img) {
+            const imgLocalPath = files.img[0].path;
+            const uploadedImage = await uploadImages(imgLocalPath);
+            
+            if (!uploadedImage || !uploadedImage.url) {
+                throw new AppError({...BAD_REQUEST, message: "Failed to upload image to Cloudinary"});
+            }
+            updateData.img = uploadedImage.url;
+        }
+
+        const updatedBlog = await blogModel.findOneAndUpdate(
+            { _id: id, userId: user._id },
+            updateData,
+            { new: true, runValidators: true }
+        ).populate('userId', 'name _id');  // Consider keeping validators enabled
+        if (!updatedBlog) throw new AppError({...NOT_FOUND, message: 'Blog not found after update'});
+        return updatedBlog;
+    } catch (err) {
         throw err;
     }
 }
@@ -120,28 +106,35 @@ const getAll = async() => {
     }
 }
 
-const commentBlog = async(params,body,user) => {
-    const {id} = params;
+const commentBlog = async (params, body, user) => {
+    const { id } = params;
     const { text } = body;
-    console.log(id,text)
-     try{
-        if(!text?.trim()) throw new AppError({...INVALID_REQUEST_DATA,message:"Text is required"})
-        const isBlogExist = await blogModel.findById(id)
-    console.log(isBlogExist)
-        if(!isBlogExist) throw new AppError({...NOT_FOUND,message:"Blog not found"})
-        const comment = {userId:user._id,text,createdAt:new Date()}
-        isBlogExist.comments.push(comment)
-        await isBlogExist.save();
-        return isBlogExist;
-    }catch(err){
-        throw err;
+  
+    if (!text?.trim()) {
+      throw new AppError({ ...INVALID_REQUEST_DATA, message: "Text is required" });
     }
-}
+  
+    const blog = await blogModel.findById(id);
+    if (!blog) {
+      throw new AppError({ ...NOT_FOUND, message: "Blog not found" });
+    }
+  
+    const comment = { userId: user._id, text, createdAt: new Date() };
+    blog.comments.push(comment);
+    await blog.save();
+  
+    const populatedBlog = await blogModel.findById(id).populate({
+      path: "comments.userId",
+      select: "name username",  
+    });
+  
+    return populatedBlog;  
+  };
+  
 
 
 const deleteComment = async (params, user) => {
     const { blogId, commentId } = params;
-    console.log(blogId,commentId)
     try {
       const blog = await blogModel.findById(blogId);
       if (!blog) throw new AppError({ ...NOT_FOUND, message: 'Blog does not exist' });
@@ -149,8 +142,7 @@ const deleteComment = async (params, user) => {
   
       const comment = blog.comments.id(commentId);
       if (!comment) throw new AppError({ ...NOT_FOUND, message: 'Comment not found' });
-        console.log(comment)
-        console.log(comment.userId.toString(),user._id.toString())
+
       if (comment.userId.toString() !== user._id.toString()) throw new AppError({ ...UNAUTHORIZED, message: 'You can only delete your own comment' });
       blog.comments = blog.comments.filter(c => c._id.toString() !== commentId);
       await blog.save();
@@ -181,4 +173,4 @@ const deleteComment = async (params, user) => {
     }
   };
   
-module.exports = {create,update,deleteOne,get,getAll,commentBlog,likes,uploadImage,deleteComment}
+module.exports = {create,update,deleteOne,get,getAll,commentBlog,likes,deleteComment}

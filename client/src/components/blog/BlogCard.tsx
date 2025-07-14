@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Heart,  ArrowRight, BookOpen } from "lucide-react";
+import { Heart,  BookOpen } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/hooks/hooks";
 import { deleteBlog, likeBlog } from "@/redux/actions/blogAction";
 import { Trash2 } from "lucide-react";
@@ -15,6 +15,7 @@ import useAuth from "@/hooks/auth";
 import UpdateDialog from "../elements/UpdateDialog";
 import { CommentDialog } from "../elements/Comment";
 import defaultImg from '@/assets/image/default.avif'
+import BlogDetailsDialog from "../elements/BlogDetailsDialog";
 
 const BlogCard = () => {
   const { blogs } = useAppSelector((state) => state.blog);
@@ -63,7 +64,6 @@ const BlogCard = () => {
             key={blog._id}
             className="h-full flex flex-col overflow-hidden hover:shadow-lg transition-all duration-300 ease-in-out hover:scale-[1.02]"
           >
-            {/* Blog Image - Consistent dimensions */}
 
             <div className="relative aspect-[16/9] w-full">
               <img
@@ -138,12 +138,12 @@ const BlogCard = () => {
                   variant="ghost"
                   size="sm"
                   onClick={() => handleLike(blog._id)}
-                 
+                 className="cursor-pointer"
                 >
                   <Heart
                     size={18}
-                    className={blog.likes.includes(userData?._id) ? "animate-pulse text-red-500" : "text-gray-400"}
-                    fill={blog.likes.includes(userData?._id) ? "red" : "transparent"}                    
+                    className={blog.likes.includes(userData?._id || "") ? "animate-pulse text-red-500" : "text-gray-400"}
+                    fill={blog.likes.includes(userData?._id || '') ? "red" : "transparent"}                    
                     />
                   <span className="text-sm font-medium">
                     {blog?.likes.length || 0}
@@ -161,15 +161,7 @@ const BlogCard = () => {
                 </Button>
               </div>
 
-              <Button
-                variant="link"
-                size="sm"
-                className="gap-1 text-blue-600 hover:text-blue-800 font-medium text-base"
-                aria-label="Read full article"
-              >
-                Read more
-                <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
-              </Button>
+           <BlogDetailsDialog blog={blog} />
             </CardFooter>
           </Card>
         )})}

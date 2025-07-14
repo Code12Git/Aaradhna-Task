@@ -72,7 +72,7 @@ export const likeBlog = (id: string) =>async (dispatch: Dispatch) => {
 };
 
 
-export const createBlog = (data: { title: string; description: string; img?: File }) => async (dispatch: Dispatch) => {
+export const createBlog = (data: { title: string; description: string; img?: File } | FormData) => async (dispatch: Dispatch) => {
   console.log(data)
   dispatch({ type: CREATE_BLOG_REQUEST })
   try {

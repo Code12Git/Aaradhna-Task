@@ -3,7 +3,12 @@ import pLimit from 'p-limit';
 
 const limit = pLimit(3);
 
-const ai = new GoogleGenAI({apiKey:"AIzaSyBNd0mXSDLl-NicOoQ9kfzI_2Rdc9XA2V4"});
+const api= import.meta.env.VITE_GOOGLE_GEMINI_API_KEY
+if (!api) {
+  throw new Error('Missing GOOGLE_GEMINI_API_KEY in environment variables');
+}
+
+const ai = new GoogleGenAI({apiKey:api});
 
 export async function suggestedBlog() {
     return limit(async () => {
